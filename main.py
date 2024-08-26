@@ -7,11 +7,15 @@ import pandas as pd
 with gzip.open("data.json.gz") as f:
     data = json.load(f)
 
-characters = pd.DataFrame(data["characters"])
-sessions = pd.DataFrame(data["sessions"])
-
+characters = pd.DataFrame(pd.json_normalize(data["characters"]))
+characters["time"] = characters["sent.time"]  # or characters["received.time"]
+characters = characters.sort_values("time").reset_index()
 print(characters)
+
+sessions = pd.DataFrame(data["sessions"])
+sessions = sessions.sort_values("started").reset_index()
 print(sessions)
+
 print()
 
 correct = (characters.result == "Correct").sum()
