@@ -1,3 +1,4 @@
 pip-tools
-matplotlib
+matplotlib # for plots
 pandas
+pyqt5 # for interactive plots
