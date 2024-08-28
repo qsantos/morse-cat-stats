@@ -26,5 +26,7 @@ print(f"Global success rate: {success_rate * 100:.1f}%")
 
 characters["correct"] = characters.result == "Correct"
 characters.rolling(window=10000).correct.mean().plot()
+plt.show(block=True)
 
+sessions.rolling(window=1000).score.mean().plot()
 plt.show(block=True)
