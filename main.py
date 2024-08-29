@@ -12,6 +12,12 @@ characters["time"] = pd.to_datetime(characters["sent.time"], format="ISO8601").f
 characters = characters.sort_values("time").reset_index(drop=True)
 print(characters)
 
+mistakes = characters[characters.result == "Incorrect"]
+common_mistakes = mistakes[["sent.character", "received.character"]].value_counts()
+mistake_grid = common_mistakes.unstack().fillna(0)
+print(mistake_grid.to_string())
+print(common_mistakes.reset_index().head(50))
+
 sessions = pd.DataFrame(data["sessions"])
 sessions["started"] = pd.to_datetime(sessions["started"], format="ISO8601")
 sessions = sessions.sort_values("started").reset_index()
