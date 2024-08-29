@@ -8,11 +8,12 @@ with gzip.open("data.json.gz") as f:
     data = json.load(f)
 
 characters = pd.DataFrame(pd.json_normalize(data["characters"]))
-characters["time"] = characters["sent.time"]  # or characters["received.time"]
-characters = characters.sort_values("time").reset_index()
+characters["time"] = pd.to_datetime(characters["sent.time"], format="ISO8601").fillna(method="ffill")  # or characters["received.time"]
+characters = characters.sort_values("time").reset_index(drop=True)
 print(characters)
 
 sessions = pd.DataFrame(data["sessions"])
+sessions["started"] = pd.to_datetime(sessions["started"], format="ISO8601")
 sessions = sessions.sort_values("started").reset_index()
 print(sessions)
 
