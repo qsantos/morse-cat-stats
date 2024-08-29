@@ -25,9 +25,12 @@ success_rate = correct / total
 
 print(f"Global success rate: {success_rate * 100:.1f}%")
 
-characters["correct"] = characters.result == "Correct"
-characters.rolling(window=10000).correct.mean().plot()
+rolling = (characters.result == "Correct").rolling(window=10000).mean()
+rolling.index = pd.to_datetime(pd.to_numeric(characters["time"]).rolling(window=10000).min())
+rolling.plot()
 plt.show(block=True)
 
-sessions.rolling(window=1000).score.mean().plot()
+rolling = sessions.rolling(window=1000).score.mean()
+rolling.index = pd.to_datetime(pd.to_numeric(sessions["started"]).rolling(window=1000).min())
+rolling.plot()
 plt.show(block=True)
