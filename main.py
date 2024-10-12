@@ -27,17 +27,17 @@ print(sessions)
 
 print()
 
-correct = (characters.result == "Correct").sum()
-total = len(characters.index)
-success_rate = correct / total
-
+correct = (characters.result == "Correct")
+success_rate = correct.sum() / len(characters.index)
 print(f"Global success rate: {success_rate * 100:.1f}%")
 
 # Plot daily accuracy
-daily_accuracy = (characters.result == "Correct").resample('d').mean().ffill()
+daily_accuracy = correct.resample('d').mean().ffill()
 daily_accuracy.plot()
 # Plot rolling average of daily accuracy
 daily_accuracy.rolling(window=10).mean().plot()
+# Plot expanding average of global accuracy
+correct.expanding().mean().plot()
 plt.show(block=True)
 
 rolling = sessions.rolling(window=1000).score.mean()
