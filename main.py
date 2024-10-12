@@ -52,3 +52,16 @@ daily_score.rolling(window=10).mean().plot()
 # Plot expanding average of global score per session
 score.expanding().mean().plot()
 plt.show(block=True)
+
+# Latency (in ms)
+correct_characters = characters[correct]
+latency = pd.to_numeric(to_time(correct_characters["received.time"]) - to_time(correct_characters["sent.time"])) * 1e6
+print(latency)
+# Plot daily latency
+daily_latency = latency.resample('d').mean().ffill()
+daily_latency.plot()
+# Plot rolling average of daily average latency
+daily_latency.rolling(window=10).mean().plot()
+# Plot expanding average of global latency
+latency.expanding().mean().plot()
+plt.show(block=True)
