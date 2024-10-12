@@ -40,6 +40,12 @@ daily_accuracy.rolling(window=10).mean().plot()
 correct.expanding().mean().plot()
 plt.show(block=True)
 
-rolling = sessions.rolling(window=1000).score.mean()
-rolling.plot()
+score = sessions.score
+# Plot daily score per session
+daily_score = score.resample('d').mean().ffill()
+daily_score.plot()
+# Plot rolling average of daily average score per session
+daily_score.rolling(window=10).mean().plot()
+# Plot expanding average of global score per session
+score.expanding().mean().plot()
 plt.show(block=True)
