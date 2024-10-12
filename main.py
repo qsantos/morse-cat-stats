@@ -11,6 +11,13 @@ characters = pd.DataFrame(pd.json_normalize(data["characters"]))
 characters["time"] = pd.to_datetime(characters["sent.time"], format="ISO8601").ffill()  # or characters["received.time"]
 characters = characters.set_index("time")
 characters = characters.sort_index()
+
+sessions = pd.DataFrame(data["sessions"])
+sessions["started"] = pd.to_datetime(sessions["started"], format="ISO8601")
+sessions = sessions.set_index("started")
+sessions = sessions.sort_index()
+
+print(sessions)
 print(characters)
 
 mistakes = characters[characters.result == "Incorrect"]
@@ -18,14 +25,6 @@ common_mistakes = mistakes[["sent.character", "received.character"]].value_count
 mistake_grid = common_mistakes.unstack().fillna(0)
 print(mistake_grid.to_string())
 print(common_mistakes.reset_index().head(50))
-
-sessions = pd.DataFrame(data["sessions"])
-sessions["started"] = pd.to_datetime(sessions["started"], format="ISO8601")
-sessions = sessions.set_index("started")
-sessions = sessions.sort_index()
-print(sessions)
-
-print()
 
 correct = (characters.result == "Correct")
 success_rate = correct.sum() / len(characters.index)
