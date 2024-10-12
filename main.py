@@ -9,7 +9,8 @@ with gzip.open("data.json.gz") as f:
 
 characters = pd.DataFrame(pd.json_normalize(data["characters"]))
 characters["time"] = pd.to_datetime(characters["sent.time"], format="ISO8601").ffill()  # or characters["received.time"]
-characters = characters.sort_values("time").reset_index(drop=True)
+characters = characters.set_index("time")
+characters = characters.sort_index()
 print(characters)
 
 mistakes = characters[characters.result == "Incorrect"]
@@ -20,7 +21,8 @@ print(common_mistakes.reset_index().head(50))
 
 sessions = pd.DataFrame(data["sessions"])
 sessions["started"] = pd.to_datetime(sessions["started"], format="ISO8601")
-sessions = sessions.sort_values("started").reset_index()
+sessions = sessions.set_index("started")
+sessions = sessions.sort_index()
 print(sessions)
 
 print()
@@ -32,11 +34,9 @@ success_rate = correct / total
 print(f"Global success rate: {success_rate * 100:.1f}%")
 
 rolling = (characters.result == "Correct").rolling(window=10000).mean()
-rolling.index = pd.to_datetime(pd.to_numeric(characters["time"]).rolling(window=10000).min())
 rolling.plot()
 plt.show(block=True)
 
 rolling = sessions.rolling(window=1000).score.mean()
-rolling.index = pd.to_datetime(pd.to_numeric(sessions["started"]).rolling(window=1000).min())
 rolling.plot()
 plt.show(block=True)
