@@ -11,6 +11,17 @@ def to_time(s: pd.Series) -> pd.Series:
     return pd.to_datetime(s, format="ISO8601")
 
 
+def plot_daily_rolling_extending(s: pd.Series):
+    # Plot daily
+    daily = s.resample('d').mean().ffill()
+    daily.plot()
+    # Plot rolling average of daily
+    daily.rolling(window=10).mean().plot()
+    # Plot expanding average
+    s.expanding().mean().plot()
+    plt.show(block=True)
+
+
 characters = pd.DataFrame(pd.json_normalize(data["characters"]))
 characters["time"] = to_time(characters["sent.time"]).ffill()
 characters = characters.set_index("time")
@@ -34,34 +45,13 @@ correct = (characters.result == "Correct")
 success_rate = correct.sum() / len(characters.index)
 print(f"Global success rate: {success_rate * 100:.1f}%")
 
-# Plot daily accuracy
-daily_accuracy = correct.resample('d').mean().ffill()
-daily_accuracy.plot()
-# Plot rolling average of daily accuracy
-daily_accuracy.rolling(window=10).mean().plot()
-# Plot expanding average of global accuracy
-correct.expanding().mean().plot()
-plt.show(block=True)
+# Plot accuracy
+plot_daily_rolling_extending(correct)
 
-score = sessions.score
-# Plot daily score per session
-daily_score = score.resample('d').mean().ffill()
-daily_score.plot()
-# Plot rolling average of daily average score per session
-daily_score.rolling(window=10).mean().plot()
-# Plot expanding average of global score per session
-score.expanding().mean().plot()
-plt.show(block=True)
+# Plot score per session
+plot_daily_rolling_extending(sessions.score)
 
-# Latency (in ms)
+# Plot latency (in ms)
 correct_characters = characters[correct]
 latency = pd.to_numeric(to_time(correct_characters["received.time"]) - to_time(correct_characters["sent.time"])) * 1e6
-print(latency)
-# Plot daily latency
-daily_latency = latency.resample('d').mean().ffill()
-daily_latency.plot()
-# Plot rolling average of daily average latency
-daily_latency.rolling(window=10).mean().plot()
-# Plot expanding average of global latency
-latency.expanding().mean().plot()
-plt.show(block=True)
+plot_daily_rolling_extending(latency)
