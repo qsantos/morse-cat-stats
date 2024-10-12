@@ -33,8 +33,9 @@ success_rate = correct / total
 
 print(f"Global success rate: {success_rate * 100:.1f}%")
 
-rolling = (characters.result == "Correct").rolling(window=10000).mean()
-rolling.plot()
+# Plot daily accuracy
+daily_accuracy = (characters.result == "Correct").resample('d').mean().ffill()
+daily_accuracy.plot()
 plt.show(block=True)
 
 rolling = sessions.rolling(window=1000).score.mean()
