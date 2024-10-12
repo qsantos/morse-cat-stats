@@ -7,13 +7,17 @@ import pandas as pd
 with gzip.open("data.json.gz") as f:
     data = json.load(f)
 
+def to_time(s: pd.Series) -> pd.Series:
+    return pd.to_datetime(s, format="ISO8601")
+
+
 characters = pd.DataFrame(pd.json_normalize(data["characters"]))
-characters["time"] = pd.to_datetime(characters["sent.time"], format="ISO8601").ffill()  # or characters["received.time"]
+characters["time"] = to_time(characters["sent.time"]).ffill()
 characters = characters.set_index("time")
 characters = characters.sort_index()
 
 sessions = pd.DataFrame(data["sessions"])
-sessions["started"] = pd.to_datetime(sessions["started"], format="ISO8601")
+sessions["started"] = to_time(sessions["started"])
 sessions = sessions.set_index("started")
 sessions = sessions.sort_index()
 
