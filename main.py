@@ -56,3 +56,8 @@ plot_daily_rolling_extending(sessions.score, "Score per session")
 correct_characters = characters[correct]
 latency = pd.to_numeric(to_time(correct_characters["received.time"]) - to_time(correct_characters["sent.time"])) * 1e6
 plot_daily_rolling_extending(latency, "Latency (ms)")
+
+# Plot mistake frequencies
+for sent_character, received_character in common_mistakes.index[:10]:
+    s = (mistakes["sent.character"] == sent_character) & (mistakes["received.character"] == received_character)
+    plot_daily_rolling_extending(s, f"Frequency among mistakes: {sent_character.upper()} was sent, but user typed {received_character.upper()}")
