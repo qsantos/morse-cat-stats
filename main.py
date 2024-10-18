@@ -11,14 +11,15 @@ def to_time(s: pd.Series) -> pd.Series:
     return pd.to_datetime(s, format="ISO8601")
 
 
-def plot_daily_rolling_extending(s: pd.Series):
+def plot_daily_rolling_extending(s: pd.Series, title: str):
     # Plot daily
     daily = s.resample('d').mean().ffill()
     daily.plot()
     # Plot rolling average of daily
     daily.rolling(window=10).mean().plot()
     # Plot expanding average
-    s.expanding().mean().plot()
+    s.expanding().mean().plot(title=title)
+    plt.legend(["Daily average", "10-day rolling average", "Expanding average"])
     plt.show(block=True)
 
 
@@ -46,12 +47,12 @@ success_rate = correct.sum() / len(characters.index)
 print(f"Global success rate: {success_rate * 100:.1f}%")
 
 # Plot accuracy
-plot_daily_rolling_extending(correct)
+plot_daily_rolling_extending(correct, "Accuracy")
 
 # Plot score per session
-plot_daily_rolling_extending(sessions.score)
+plot_daily_rolling_extending(sessions.score, "Score per session")
 
 # Plot latency (in ms)
 correct_characters = characters[correct]
 latency = pd.to_numeric(to_time(correct_characters["received.time"]) - to_time(correct_characters["sent.time"])) * 1e6
-plot_daily_rolling_extending(latency)
+plot_daily_rolling_extending(latency, "Latency (ms)")
