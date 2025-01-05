@@ -13,7 +13,7 @@ def to_time(s: pd.Series) -> pd.Series:
 
 def plot_daily_rolling_extending(s: pd.Series, title: str):
     # Plot daily
-    daily = s.resample('d').mean().ffill()
+    daily = s.resample('d').mean().dropna()
     daily.plot()
     # Plot rolling average of daily
     daily.rolling(window=10).mean().plot()
