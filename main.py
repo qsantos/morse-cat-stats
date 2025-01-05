@@ -33,6 +33,13 @@ sessions["started"] = to_time(sessions["started"])
 sessions = sessions.set_index("started")
 sessions = sessions.sort_index()
 
+# Filter out days with too few data points, which lead to meaningless outliers
+counts = characters["sent.time"].resample('d').count()
+for day_to_exclude in counts[(0 < counts) & (counts < 1000)].index:
+    # NOTE: could be optimized with datetime range test if needed
+    characters = characters[characters.index.date != day_to_exclude.date()]
+    sessions = sessions[sessions.index.date != day_to_exclude.date()]
+
 print(sessions)
 print(characters)
 
