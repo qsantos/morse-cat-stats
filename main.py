@@ -1,11 +1,17 @@
 import gzip
 import json
 
+from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import pandas as pd
 
-with gzip.open("data.json.gz") as f:
+parser = ArgumentParser()
+parser.add_argument("file", help="For instance, morse-cat-data.json.gz")
+args = parser.parse_args()
+
+with gzip.open(args.file) as f:
     data = json.load(f)
+
 
 def to_time(s: pd.Series) -> pd.Series:
     return pd.to_datetime(s, format="ISO8601")
