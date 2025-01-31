@@ -1,4 +1,0 @@
-pip-tools
-matplotlib # for plots
-pandas
-pyqt5 # for interactive plots
