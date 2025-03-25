@@ -1,4 +1,12 @@
 #!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "matplotlib>=3.10.0",
+#     "pandas>=2.2.3",
+#     "pyqt5>=5.15.11",
+# ]
+# ///
 import gzip
 import json
 
