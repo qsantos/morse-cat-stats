@@ -36,7 +36,8 @@ characters = characters.sort_index()
 
 sessions = pd.DataFrame(data["sessions"])
 sessions["started"] = to_time(sessions["started"])
-sessions = sessions.set_index("started")
+sessions["finished"] = to_time(sessions["finished"])
+sessions.index = sessions["started"]
 sessions = sessions.sort_index()
 
 # Filter out days with too few data points, which lead to meaningless outliers
@@ -61,6 +62,10 @@ print(f"Global success rate: {success_rate * 100:.1f}%")
 
 # Plot accuracy
 plot_daily_rolling_extending(correct, "Accuracy")
+
+# Plot session duration
+elapsed = (sessions["finished"] - sessions["started"]).dt.total_seconds()
+plot_daily_rolling_extending(elapsed, "Session duration")
 
 # Plot score per session
 plot_daily_rolling_extending(sessions.score, "Score per session")
