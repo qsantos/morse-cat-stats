@@ -34,6 +34,10 @@ def plot_daily_rolling_extending(s: pd.Series, title: str):
     daily.rolling(window=10).mean().plot()
     # Plot expanding average
     s.expanding().mean().plot(title=title)
+    for time, label in diffs:
+        # draw a faint red line
+        plt.axvline(time, color='red')
+        plt.text(time, plt.ylim()[1], label, rotation=90, verticalalignment='bottom', fontsize=8)
     plt.legend(["Daily average", "10-day rolling average", "Expanding average"])
     plt.show(block=True)
 
@@ -46,14 +50,15 @@ sessions = sessions.sort_index()
 
 prev_settings = sessions['settings'].shift()
 changes = sessions[sessions['settings'] != prev_settings]
+diffs = []
 for idx, row in changes.iterrows():
     prev_values = prev_settings.loc[idx]
-    diffs = []
+    diff = []
     for key, value in row['settings'].items():
         prev_value = prev_values.get(key) if prev_values is not None else None
         if value != prev_value:
-            diffs.append(f"{key}:{prev_value}→{value}")
-    print(f"{idx}: {', '.join(diffs)}")
+            diff.append(f"{key}:{prev_value}→{value}")
+    diffs.append((idx, ', '.join(diff)))
 
 characters = pd.DataFrame(pd.json_normalize(data["characters"]))
 characters["time"] = to_time(characters["sent.time"]).ffill()
