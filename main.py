@@ -44,6 +44,17 @@ sessions["finished"] = to_time(sessions["finished"])
 sessions.index = sessions["started"]
 sessions = sessions.sort_index()
 
+prev_settings = sessions['settings'].shift()
+changes = sessions[sessions['settings'] != prev_settings]
+for idx, row in changes.iterrows():
+    prev_values = prev_settings.loc[idx]
+    diffs = []
+    for key, value in row['settings'].items():
+        prev_value = prev_values.get(key) if prev_values is not None else None
+        if value != prev_value:
+            diffs.append(f"{key}:{prev_value}→{value}")
+    print(f"{idx}: {', '.join(diffs)}")
+
 characters = pd.DataFrame(pd.json_normalize(data["characters"]))
 characters["time"] = to_time(characters["sent.time"]).ffill()
 characters = characters.set_index("time")
