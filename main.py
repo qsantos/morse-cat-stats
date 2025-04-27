@@ -38,16 +38,16 @@ def plot_daily_rolling_extending(s: pd.Series, title: str):
     plt.show(block=True)
 
 
-characters = pd.DataFrame(pd.json_normalize(data["characters"]))
-characters["time"] = to_time(characters["sent.time"]).ffill()
-characters = characters.set_index("time")
-characters = characters.sort_index()
-
 sessions = pd.DataFrame(data["sessions"])
 sessions["started"] = to_time(sessions["started"])
 sessions["finished"] = to_time(sessions["finished"])
 sessions.index = sessions["started"]
 sessions = sessions.sort_index()
+
+characters = pd.DataFrame(pd.json_normalize(data["characters"]))
+characters["time"] = to_time(characters["sent.time"]).ffill()
+characters = characters.set_index("time")
+characters = characters.sort_index()
 
 # Filter out days with too few data points, which lead to meaningless outliers
 counts = characters["sent.time"].resample('d').count()
