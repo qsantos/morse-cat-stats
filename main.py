@@ -18,7 +18,8 @@ parser = ArgumentParser()
 parser.add_argument("file", help="For instance, morse-cat-data.json.gz")
 args = parser.parse_args()
 
-with gzip.open(args.file) as f:
+opener = gzip.open if args.file.endswith("gz") else open
+with opener(args.file) as f:
     data = json.load(f)
 
 
