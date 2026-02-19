@@ -65,32 +65,17 @@ for idx, row in changes.iterrows():
             diff.append(f"{key}:{prev_value}→{value}")
     diffs.append((idx.date(), ', '.join(diff)))
 
-characters = pd.DataFrame(pd.json_normalize(data["characters"]))
-characters["time"] = to_time(characters["sent.time"]).ffill()
-characters = characters.set_index("time")
-characters = characters.sort_index()
-
 # Filter out days with too few data points, which lead to meaningless outliers
-counts = characters["sent.time"].resample('D').count()
-for day_to_exclude in counts[(0 < counts) & (counts < 1000)].index:
-    # NOTE: could be optimized with datetime range test if needed
-    characters = characters[characters.index.date != day_to_exclude.date()]
+elapsed = sessions["elapsed"].resample('D').sum()
+days_to_exclude = elapsed[(0 < elapsed) & (elapsed < 100)].index
+for day_to_exclude in days_to_exclude:
     sessions = sessions[sessions.index.date != day_to_exclude.date()]
 
-print(sessions)
-print(characters)
-
-mistakes = characters[characters.result == "Incorrect"]
-common_mistakes = mistakes[["sent.character", "received.character"]].value_counts()
-mistake_grid = common_mistakes.unstack().fillna(0)
-print(mistake_grid.to_string())
-print(common_mistakes.reset_index().head(50))
-
-correct = (characters.result == "Correct")
-success_rate = correct.sum() / len(characters.index)
-print(f"Global success rate: {success_rate * 100:.1f}%")
-
 # Plot accuracy
+sentCharacters = sessions.copiedCharacters + ~sessions.mistake.isna()
+success_rate = 1 - sessions.id.count() / sentCharacters.sum()
+print(f"Global success rate: {success_rate * 100:.1f}%")
+correct = 1 - sessions.id.resample('D').count() / sentCharacters.resample('D').sum()
 plot_daily_rolling_extending(correct, "Accuracy")
 
 # Plot session duration
@@ -100,8 +85,23 @@ plot_daily_rolling_extending(elapsed, "Session duration")
 # Plot score per session
 plot_daily_rolling_extending(sessions.score, "Score per session")
 
+characters = pd.DataFrame(pd.json_normalize(data["characters"]))
+characters["time"] = to_time(characters["sent.time"]).ffill()
+characters = characters.set_index("time")
+characters = characters.sort_index()
+
+# Filter out days with too few data points, which lead to meaningless outliers
+for day_to_exclude in days_to_exclude:
+    characters = characters[characters.index.date != day_to_exclude.date()]
+
+mistakes = characters[characters.result == "Incorrect"]
+common_mistakes = mistakes[["sent.character", "received.character"]].value_counts()
+mistake_grid = common_mistakes.unstack().fillna(0)
+print(mistake_grid.to_string())
+print(common_mistakes.reset_index().head(50))
+
 # Plot latency (in ms)
-correct_characters = characters[correct]
+correct_characters = characters[characters.result == "Correct"]
 latency = pd.to_numeric(to_time(correct_characters["received.time"]) - to_time(correct_characters["sent.time"])) * 1e6
 plot_daily_rolling_extending(latency, "Latency (ms)")
 
