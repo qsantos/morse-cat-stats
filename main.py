@@ -29,7 +29,7 @@ def to_time(s: pd.Series) -> pd.Series:
 
 def plot_daily_rolling_extending(s: pd.Series, title: str):
     # Plot daily
-    daily = s.resample('d').mean().dropna()
+    daily = s.resample('D').mean().dropna()
     daily.plot()
     # Plot rolling average of daily
     daily.rolling(window=10).mean().plot()
@@ -71,7 +71,7 @@ characters = characters.set_index("time")
 characters = characters.sort_index()
 
 # Filter out days with too few data points, which lead to meaningless outliers
-counts = characters["sent.time"].resample('d').count()
+counts = characters["sent.time"].resample('D').count()
 for day_to_exclude in counts[(0 < counts) & (counts < 1000)].index:
     # NOTE: could be optimized with datetime range test if needed
     characters = characters[characters.index.date != day_to_exclude.date()]
